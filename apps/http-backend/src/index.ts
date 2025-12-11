@@ -96,7 +96,45 @@ app.post("/room", middleware, async (req, res) => {
     }
 })
 
+app.get("/chats/:roomId", async (req, res) => {
+    try {
 
+        const roomId = Number(req.params.roomId);
+        const messages = await prismaClient.chat.findMany({
+            where: {
+                roomId: roomId
+            },
+            orderBy: {
+                id: "desc"
+            },
+            take: 50
+        })
+        res.json({
+            messages
+        })
+    } catch (err: any) {
+        res.status(400).json({
+            message: err.message
+        })
+    }
+})
+
+app.get("/room/:slug", async (req, res) => {
+    try {
+
+        const slug = req.params.slug;
+        const room = await prismaClient.room.findFirst({
+            where: {
+                slug
+            }
+        })
+        res.json({
+            room
+        })
+    } catch (err: any) {
+        res.status(400).json({ message: err.message })
+    }
+})
 
 app.listen(4000, () => {
     console.log("http server running on port 4000")
