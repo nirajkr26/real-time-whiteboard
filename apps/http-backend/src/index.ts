@@ -109,6 +109,7 @@ app.get("/chats/:roomId", async (req, res) => {
             },
             take: 50
         })
+
         res.json({
             messages
         })
@@ -128,6 +129,7 @@ app.get("/room/:slug", async (req, res) => {
                 slug
             }
         })
+        
         res.json({
             room
         })
