@@ -4,7 +4,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "esbuild src/index.ts --platform=node --bundle --outdir=dist",
+    "build": "esbuild src/index.ts --platform=node --bundle --outdir=dist --external:@prisma/client",
     "start": "node dist/index.js",
     "dev": "npm run build && npm run start"
   },
@@ -19,6 +19,7 @@
     "@types/jsonwebtoken": "^9.0.10"
   },
   "dependencies": {
+    "@prisma/client": "^7.1.0",
     "@types/ws": "^8.18.1",
     "dotenv": "^17.2.3",
     "esbuild": "^0.27.1",

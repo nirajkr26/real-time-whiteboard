@@ -5,7 +5,11 @@ import { JWT_SECRET } from "@repo/backend-common/config"
 import { middleware } from "./middleware"
 import { CreateUserSchema, SigninSchema, CreateRoomSchema } from "@repo/common/types"
 import { prismaClient } from "@repo/db/client"
+import cors from "cors";
+
 const app = express()
+
+app.use(cors())
 
 app.use(express.json())
 
@@ -129,7 +133,7 @@ app.get("/room/:slug", async (req, res) => {
                 slug
             }
         })
-        
+
         res.json({
             room
         })
