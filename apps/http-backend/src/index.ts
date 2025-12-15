@@ -6,6 +6,7 @@ import { middleware } from "./middleware"
 import { CreateUserSchema, SigninSchema, CreateRoomSchema } from "@repo/common/types"
 import { prismaClient } from "@repo/db/client"
 import cors from "cors";
+import argon2 from "argon2"
 
 const app = express()
 
@@ -23,12 +24,24 @@ app.post("/signup", async (req, res) => {
             })
             return;
         }
+        const existingUser = await prismaClient.user.findFirst({
+            where: {
+                email: parseddata.data?.username
+            }
+        })
+
+        if (existingUser) {
+            res.json({ message: "A user with this email already exists" })
+            return
+        }
+
+        const hashed = await argon2.hash(parseddata.data?.password);
 
         const User = await prismaClient.user.create({
             data: {
                 name: parseddata.data?.name,
                 email: parseddata.data?.username,
-                password: parseddata.data?.password
+                password: hashed
             }
         })
 
@@ -56,7 +69,14 @@ app.post("/signin", async (req, res) => {
             }
         })
 
-        if (User?.password != parsedData.data.password) {
+        if (!User) {
+            res.json({ message: "Incorrect credentials" });
+            return;
+        }
+
+        const isValid = await argon2.verify(User.password, parsedData.data?.password)
+
+        if (!isValid) {
             res.json({ message: "Incorrect credentials" })
             return;
         }
@@ -111,7 +131,7 @@ app.get("/chats/:roomId", async (req, res) => {
             orderBy: {
                 id: "desc"
             },
-            take: 50
+            take: 200
         })
 
         res.json({
